@@ -1,74 +1,44 @@
-'use client';
-import { useSession } from 'next-auth/react';
-import { useState } from 'react';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import Image from 'next/image';
+import Link from 'next/link';
+import { prisma } from '@/lib/db';
 
-export default function ProfilePage() {
-  const { data: session } = useSession();
-  const [nickname, setNickname] = useState('');
-  const [bio, setBio] = useState('');
-  const [twitter, setTwitter] = useState('');
-  const [telegram, setTelegram] = useState('');
-  const [website, setWebsite] = useState('');
-  const [donationAddress, setDonationAddress] = useState('');
+export default async function MyProfile() {
+  const session = await getServerSession(authOptions);
+  if (!session) return <p className="p-8">Please login</p>;
 
-  if (!session) return <p>Please login</p>;
-
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
-    await fetch('/api/profile', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nickname, bio, twitter, telegram, website, donationAddress }),
-    });
-  }
+  const user = await prisma.user.findUnique({
+    where: { id: (session.user as { id: string }).id },
+    select: {
+      id: true,
+      name: true,
+      image: true,
+      nickname: true,
+      bio: true,
+      twitter: true,
+      telegram: true,
+      website: true,
+    },
+  });
+  if (!user) return <p className="p-8">Profile not found</p>;
 
   return (
     <div className="p-8 max-w-xl mx-auto">
-      <h1 className="text-xl font-bold mb-4">Profile</h1>
-      <form className="flex flex-col gap-4" onSubmit={submit}>
-        <input
-          type="text"
-          placeholder="Nickname"
-          value={nickname}
-          onChange={(e) => setNickname(e.target.value)}
-          className="border p-2"
-        />
-        <textarea
-          placeholder="Bio"
-          value={bio}
-          onChange={(e) => setBio(e.target.value)}
-          className="border p-2"
-        />
-        <input
-          type="text"
-          placeholder="Twitter"
-          value={twitter}
-          onChange={(e) => setTwitter(e.target.value)}
-          className="border p-2"
-        />
-        <input
-          type="text"
-          placeholder="Telegram"
-          value={telegram}
-          onChange={(e) => setTelegram(e.target.value)}
-          className="border p-2"
-        />
-        <input
-          type="text"
-          placeholder="Website"
-          value={website}
-          onChange={(e) => setWebsite(e.target.value)}
-          className="border p-2"
-        />
-        <input
-          type="text"
-          placeholder="Donation address"
-          value={donationAddress}
-          onChange={(e) => setDonationAddress(e.target.value)}
-          className="border p-2"
-        />
-        <button type="submit" className="px-4 py-2 border rounded">Save</button>
-      </form>
+      {user.image && (
+        <Image src={user.image} alt="avatar" width={80} height={80} className="rounded-full" />
+      )}
+      <h1 className="text-xl font-bold mt-4">{user.nickname || user.name || user.id}</h1>
+      {user.bio && <p className="mt-2">{user.bio}</p>}
+      {user.twitter && (
+        <p className="mt-2">Twitter: <a href={`https://twitter.com/${user.twitter}`}>{user.twitter}</a></p>
+      )}
+      {user.website && (
+        <p className="mt-2">Website: <a href={user.website}>{user.website}</a></p>
+      )}
+      <Link href="/profile/edit" className="inline-block mt-4 px-4 py-2 border rounded">
+        Редактировать
+      </Link>
     </div>
   );
 }
