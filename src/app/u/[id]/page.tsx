@@ -8,6 +8,7 @@ export default async function PublicProfile({
 }) {
   const { id } = await params
   const user = await prisma.user.findUnique({ where: { id } })
+
   if (!user) return <p className="p-8">User not found</p>;
   return (
     <div className="p-8 max-w-xl mx-auto">
