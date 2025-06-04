@@ -20,7 +20,13 @@ Create a `.env` file based on `.env.example` before starting the server:
 cp .env.example .env
 ```
 
-Set `NEXTAUTH_SECRET` to any random string.
+Set `NEXTAUTH_SECRET` to any random string. If you access the app through a
+non-localhost address, set `NEXTAUTH_URL` to that full URL. Otherwise the
+current request's host will be used for authentication.
+
+When you start the development server the first time, the Prisma schema will be
+applied automatically via `prisma migrate deploy`. This creates the `dev.db`
+SQLite database if it does not already exist.
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
