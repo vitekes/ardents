@@ -1,62 +1,93 @@
-import { prisma } from '@/lib/db';
-import Image from 'next/image';
-import { notFound } from 'next/navigation';
+'use client';
+import { useSession } from 'next-auth/react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
-type PageProps = {
-  params: { id: string };
-};
+export default function ProfilePage() {
+  const { data: session, update } = useSession();
+  const router = useRouter();
+  const [nickname, setNickname] = useState('');
+  const [bio, setBio] = useState('');
+  const [twitter, setTwitter] = useState('');
+  const [telegram, setTelegram] = useState('');
+  const [website, setWebsite] = useState('');
+  const [donationAddress, setDonationAddress] = useState('');
 
-export default async function PublicProfile({ params }: PageProps) {
-  const { id } = params;                       // ✨ без await
-  const user = await prisma.user.findUnique({
-    where: { id: id.toLowerCase() },           // адреса храним в lower-case
-  });
+  useEffect(() => {
+    if (!session) return;
+    fetch('/api/profile')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (!data) return;
+        setNickname(data.nickname ?? '');
+        setBio(data.bio ?? '');
+        setTwitter(data.twitter ?? '');
+        setTelegram(data.telegram ?? '');
+        setWebsite(data.website ?? '');
+        setDonationAddress(data.donationAddress ?? '');
+      });
+  }, [session]);
 
-  if (!user) notFound();                       // корректный 404
+  if (!session) return <p>Please login</p>;
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    await fetch('/api/profile', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nickname, bio, twitter, telegram, website, donationAddress }),
+    });
+    await update();
+    router.push('/profile');
+  }
 
   return (
     <div className="p-8 max-w-xl mx-auto">
-      {user.image && (
-        <Image
-          src={user.image}
-          alt="avatar"
-          width={80}
-          height={80}
-          className="rounded-full"
+      <h1 className="text-xl font-bold mb-4">Profile</h1>
+      <form className="flex flex-col gap-4" onSubmit={submit}>
+        <input
+          type="text"
+          placeholder="Nickname"
+          value={nickname}
+          onChange={(e) => setNickname(e.target.value)}
+          className="border p-2"
         />
-      )}
-
-      <h1 className="text-xl font-bold mt-4">
-        {user.nickname || user.name || user.id}
-      </h1>
-
-      {user.bio && <p className="mt-2">{user.bio}</p>}
-
-      {user.twitter && (
-        <p className="mt-2">
-          Twitter:{' '}
-          <a
-            href={`https://twitter.com/${user.twitter}`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {user.twitter}
-          </a>
-        </p>
-      )}
-
-      {user.website && (
-        <p className="mt-2">
-          Website:{' '}
-          <a
-            href={user.website}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {user.website}
-          </a>
-        </p>
-      )}
+        <textarea
+          placeholder="Bio"
+          value={bio}
+          onChange={(e) => setBio(e.target.value)}
+          className="border p-2"
+        />
+        <input
+          type="text"
+          placeholder="Twitter"
+          value={twitter}
+          onChange={(e) => setTwitter(e.target.value)}
+          className="border p-2"
+        />
+        <input
+          type="text"
+          placeholder="Telegram"
+          value={telegram}
+          onChange={(e) => setTelegram(e.target.value)}
+          className="border p-2"
+        />
+        <input
+          type="text"
+          placeholder="Website"
+          value={website}
+          onChange={(e) => setWebsite(e.target.value)}
+          className="border p-2"
+        />
+        <input
+          type="text"
+          placeholder="Donation address"
+          value={donationAddress}
+          onChange={(e) => setDonationAddress(e.target.value)}
+          className="border p-2"
+        />
+        <button type="submit" className="px-4 py-2 border rounded">Save</button>
+      </form>
     </div>
   );
 }

@@ -3,20 +3,26 @@ import { authOptions } from '@/lib/auth';
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { prisma } from '@/lib/db';
+
 export default async function MyProfile() {
   const session = await getServerSession(authOptions);
   if (!session) return <p className="p-8">Please login</p>;
 
-  const user = session.user as {
-    id: string;
-    name?: string | null;
-    image?: string | null;
-    nickname?: string | null;
-    bio?: string | null;
-    twitter?: string | null;
-    telegram?: string | null;
-    website?: string | null;
-  };
+  const user = await prisma.user.findUnique({
+    where: { id: (session.user as { id: string }).id },
+    select: {
+      id: true,
+      name: true,
+      image: true,
+      nickname: true,
+      bio: true,
+      twitter: true,
+      telegram: true,
+      website: true,
+    },
+  });
+  if (!user) return <p className="p-8">Profile not found</p>;
 
   return (
     <div className="p-8 max-w-xl mx-auto">
