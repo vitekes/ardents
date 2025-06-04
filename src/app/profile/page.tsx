@@ -37,7 +37,7 @@ export default async function MyProfile() {
       {user.website && (
         <p className="mt-2">Website: <a href={user.website}>{user.website}</a></p>
       )}
-      <Link href="/profile/edit" className="inline-block mt-4 px-4 py-2 border rounded">
+      <Link href="/profile/edit" className="inline-block mt-4 px-4 py-2 border rounded bg-blue-500 text-white hover:bg-blue-600 active:bg-blue-700 transition">
         Редактировать
       </Link>
     </div>

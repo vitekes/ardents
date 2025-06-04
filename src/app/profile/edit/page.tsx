@@ -86,7 +86,7 @@ export default function ProfilePage() {
           onChange={(e) => setDonationAddress(e.target.value)}
           className="border p-2"
         />
-        <button type="submit" className="px-4 py-2 border rounded">Save</button>
+        <button type="submit" className="px-4 py-2 border rounded bg-blue-500 text-white hover:bg-blue-600 active:bg-blue-700 transition">Save</button>
       </form>
     </div>
   );
