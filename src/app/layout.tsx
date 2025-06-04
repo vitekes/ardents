@@ -5,10 +5,6 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Providers from "@/components/Providers";
 
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import Providers from "@/components/Providers";
-
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

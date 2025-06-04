@@ -2,16 +2,22 @@
 import Link from 'next/link';
 import { useSession, signIn, signOut } from 'next-auth/react';
 import Image from 'next/image';
-import { useAccount, useSignMessage } from 'wagmi';
+import { useAccount, useSignMessage, useConnect } from 'wagmi';
 import { SiweMessage } from 'siwe';
 
 export default function Header() {
   const { data: session } = useSession();
   const { address, isConnected } = useAccount();
   const { signMessageAsync } = useSignMessage();
+  const { connect, connectors } = useConnect();
 
   async function handleLogin() {
-    if (!isConnected || !address) return;
+    if (!isConnected || !address) {
+      if (connectors?.[0]) {
+        await connect({ connector: connectors[0] });
+      }
+      return;
+    }
     const nonceRes = await fetch('/api/auth/csrf');
     const { csrfToken } = await nonceRes.json();
     const message = new SiweMessage({
