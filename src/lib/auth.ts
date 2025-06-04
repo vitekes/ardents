@@ -15,10 +15,10 @@ export const authOptions: NextAuthOptions = {
         message: { label: "Message", type: "text" },
         signature: { label: "Signature", type: "text" },
       },
-      async authorize(credentials, req) {
+        async authorize(credentials, req) {
         try {
           const siwe = new SiweMessage(JSON.parse(credentials?.message || "{}"));
-          const csrf = (req?.headers?.["x-csrf-token"] as string) ?? "";
+          const csrf = (req?.body?.csrfToken as string) ?? "";
           const { success } = await siwe.verify({
             signature: credentials?.signature || "",
             domain: new URL(process.env.NEXTAUTH_URL ?? "http://localhost:3000").host,
