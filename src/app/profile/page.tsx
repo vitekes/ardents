@@ -2,6 +2,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import Image from 'next/image';
 import Link from 'next/link';
+
 import { prisma } from '@/lib/db';
 
 export default async function MyProfile() {
