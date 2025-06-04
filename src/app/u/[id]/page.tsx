@@ -1,12 +1,13 @@
-import { prisma } from '@/lib/db';
-import Image from 'next/image';
+import { prisma } from '@/lib/db'
+import Image from 'next/image'
 
-interface Props {
-  params: { id: string };
-}
-
-export default async function PublicProfile({ params }: Props) {
-  const user = await prisma.user.findUnique({ where: { id: params.id } });
+export default async function PublicProfile({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}) {
+  const { id } = await params
+  const user = await prisma.user.findUnique({ where: { id } })
   if (!user) return <p className="p-8">User not found</p>;
   return (
     <div className="p-8 max-w-xl mx-auto">
