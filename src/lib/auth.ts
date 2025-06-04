@@ -20,7 +20,9 @@ export const authOptions: NextAuthOptions = {
           const siwe = new SiweMessage(JSON.parse(credentials?.message || "{}"));
           const csrf = (req?.body?.csrfToken as string) ?? "";
           const host =
-            req?.headers?.get("host") ??
+            (typeof req?.headers?.get === "function"
+              ? req.headers.get("host")
+              : (req?.headers as Record<string, string> | undefined)?.host) ??
             new URL(process.env.NEXTAUTH_URL ?? "http://localhost:3000").host;
           const { success } = await siwe.verify({
             signature: credentials?.signature || "",
