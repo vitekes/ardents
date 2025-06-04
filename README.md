@@ -14,6 +14,14 @@ pnpm dev
 bun dev
 ```
 
+Create a `.env` file based on `.env.example` before starting the server:
+
+```bash
+cp .env.example .env
+```
+
+Set `NEXTAUTH_SECRET` to any random string.
+
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
