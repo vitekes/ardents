@@ -64,7 +64,7 @@ export default function PostsFeed({
   }, [cursor, uid]);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 max-w-lg mx-auto">
       {posts.map((post) => (
         <div key={post.id} className="border p-4 rounded">
           <div className="flex items-center gap-2 mb-2">
@@ -96,8 +96,8 @@ export default function PostsFeed({
           {post.photos.length > 0 && (
             <ImageCarousel
               photos={post.photos}
-              width={200}
-              height={200}
+              width={480}
+              height={640}
               className="mb-2"
             />
           )}
