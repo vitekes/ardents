@@ -47,3 +47,4 @@ next-env.d.ts
 /prisma/dev.db-journal
 /uploads
 !/uploads/.gitkeep
+/package-lock.json
