@@ -23,6 +23,7 @@ export async function GET(req: Request) {
       _count: { select: { likes: true } },
     },
   });
+
   type PostWithExtras = Prisma.PostGetPayload<{
     include: {
       photos: true;
