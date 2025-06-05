@@ -97,6 +97,7 @@ export default function PostsFeed({
           )}
           {post.description && <p className="mb-1">{post.description}</p>}
           {post.tags && <p className="text-sm text-gray-500">{post.tags}</p>}
+          <Link href={`/posts/${post.id}`} className="text-sm text-blue-500">Комментарии</Link>
         </div>
       ))}
       <div ref={loaderRef} />
