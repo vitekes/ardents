@@ -50,7 +50,7 @@ export default function Header() {
       </nav>
       <div>
         {!session ? (
-          <button onClick={handleLogin} className="px-4 py-2 border rounded">
+          <button onClick={handleLogin} className="px-4 py-2 border rounded bg-blue-500 text-white hover:bg-blue-600 active:bg-blue-700 transition">
             Login
           </button>
         ) : (
@@ -58,7 +58,7 @@ export default function Header() {
             {session.user?.image && (
               <Image src={session.user.image} alt="avatar" width={32} height={32} className="rounded-full" />
             )}
-            <button onClick={() => signOut()} className="px-4 py-2 border rounded">
+            <button onClick={() => signOut()} className="px-4 py-2 border rounded bg-blue-500 text-white hover:bg-blue-600 active:bg-blue-700 transition">
               Logout
             </button>
           </div>
