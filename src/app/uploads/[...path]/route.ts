@@ -5,9 +5,10 @@ import mime from 'mime';
 
 export async function GET(
   req: Request,
-  { params }: { params: { path: string[] } }
+  { params }: { params: Promise<{ path: string[] }> }
 ) {
-  const filePath = path.join(process.cwd(), 'uploads', ...params.path);
+  const { path: pathParts } = await params;
+  const filePath = path.join(process.cwd(), 'uploads', ...pathParts);
   try {
     const data = await fs.readFile(filePath);
     const type = mime.getType(filePath) || 'application/octet-stream';
