@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import ImageCarousel from './ImageCarousel';
 import Link from 'next/link';
+import LikeButton from './LikeButton';
 
 interface Photo {
   id: string;
@@ -14,6 +15,9 @@ interface Post {
   description?: string | null;
   tags?: string | null;
   photos: Photo[];
+  views: number;
+  likeCount: number;
+  likedByMe?: boolean;
   user: {
     id: string;
     nickname?: string | null;
@@ -103,7 +107,11 @@ export default function PostsFeed({
           )}
           {post.description && <p className="mb-1">{post.description}</p>}
           {post.tags && <p className="text-sm text-gray-500">{post.tags}</p>}
-          <Link href={`/posts/${post.id}`} className="text-sm text-blue-500">Комментарии</Link>
+          <div className="flex items-center gap-4 text-sm mt-1">
+            <span>Просмотры: {post.views}</span>
+            <LikeButton postId={post.id} initialLiked={post.likedByMe} initialCount={post.likeCount} />
+            <Link href={`/posts/${post.id}`} className="ml-auto text-blue-500">Комментарии</Link>
+          </div>
         </div>
       ))}
       <div ref={loaderRef} />

@@ -2,13 +2,16 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { NextResponse } from 'next/server';
+import type { Prisma } from '@prisma/client';
 
 export async function GET(req: Request) {
+  const session = await getServerSession(authOptions);
+  const currentUserId = (session?.user as { id?: string })?.id;
   const { searchParams } = new URL(req.url);
   const cursor = searchParams.get('cursor');
   const userId = searchParams.get('userId');
   const take = 10;
-  const posts = await prisma.post.findMany({
+  const postsRaw = await prisma.post.findMany({
     take: take + 1,
     ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
     ...(userId ? { where: { userId } } : {}),
@@ -16,8 +19,23 @@ export async function GET(req: Request) {
     include: {
       photos: true,
       user: { select: { id: true, nickname: true, name: true, image: true } },
+      likes: currentUserId ? { where: { userId: currentUserId } } : undefined,
+      _count: { select: { likes: true } },
     },
   });
+  type PostWithExtras = Prisma.PostGetPayload<{
+    include: {
+      photos: true;
+      user: { select: { id: true; nickname: true | null; name: true | null; image: true | null } };
+      likes: true;
+      _count: { select: { likes: true } };
+    };
+  }>;
+  const posts = postsRaw.map((p: PostWithExtras) => ({
+    ...p,
+    likeCount: p._count.likes,
+    likedByMe: p.likes.length > 0,
+  }));
   let nextCursor: string | undefined = undefined;
   if (posts.length > take) {
     const next = posts.pop();
