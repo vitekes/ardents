@@ -49,9 +49,21 @@ export default function NewPostPage() {
           {photoUrls.length === 0 ? (
             <p>Перетащите изображения сюда или нажмите для выбора</p>
           ) : (
-            <div className="flex gap-2 overflow-x-auto">
-              {photoUrls.map((url) => (
-                <img key={url} src={url} alt="preview" className="w-20 h-20 object-cover" />
+            <div className="grid grid-cols-5 gap-2">
+              {photoUrls.map((url, i) => (
+                <div key={url} className="relative w-20 h-20">
+                  <img src={url} alt="preview" className="object-cover w-20 h-20" />
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setPhotoUrls((u) => u.filter((_, idx) => idx !== i));
+                    }}
+                    className="absolute top-0 right-0 bg-white/80 rounded-full px-1"
+                  >
+                    🗑
+                  </button>
+                </div>
               ))}
             </div>
           )}
