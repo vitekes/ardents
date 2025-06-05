@@ -24,6 +24,7 @@ model User {
   sessions        Session[]
   Authenticator   Authenticator[]
   posts           Post[]
+  comments        Comment[]
 }
 
 model Post {
@@ -35,6 +36,7 @@ model Post {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   photos      Photo[]
+  comments    Comment[]
 }
 
 model Photo {
@@ -43,6 +45,21 @@ model Photo {
   url    String
 
   post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  postId    String
+  userId    String
+  parentId  String?
+  text      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  post   Post    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parent Comment? @relation("CommentToReplies", fields: [parentId], references: [id])
+  replies Comment[] @relation("CommentToReplies")
 }
 
 model Account {
