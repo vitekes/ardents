@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
+import ImageCarousel from './ImageCarousel';
 import Link from 'next/link';
 
 interface Photo {
@@ -82,18 +83,12 @@ export default function PostsFeed({
             )}
           </div>
           {post.photos.length > 0 && (
-            <div className="flex gap-2 overflow-x-auto mb-2">
-              {post.photos.map((photo) => (
-                <Image
-                  key={photo.id}
-                  src={photo.url}
-                  alt="photo"
-                  width={200}
-                  height={200}
-                  className="object-cover"
-                />
-              ))}
-            </div>
+            <ImageCarousel
+              photos={post.photos}
+              width={200}
+              height={200}
+              className="mb-2"
+            />
           )}
           {post.description && <p className="mb-1">{post.description}</p>}
           {post.tags && <p className="text-sm text-gray-500">{post.tags}</p>}

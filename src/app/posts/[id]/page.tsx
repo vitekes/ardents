@@ -4,6 +4,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import Comments from './Comments';
 import Link from 'next/link';
+import ImageCarousel from '@/components/ImageCarousel';
 
 export default async function PostPage({
   params,
@@ -34,11 +35,7 @@ export default async function PostPage({
           )}
         </div>
         {post.photos.length > 0 && (
-          <div className="flex gap-2 overflow-x-auto mb-2">
-            {post.photos.map((photo) => (
-              <Image key={photo.id} src={photo.url} alt="photo" width={200} height={200} className="object-cover" />
-            ))}
-          </div>
+          <ImageCarousel photos={post.photos} width={400} height={400} className="mb-2" />
         )}
         {post.description && <p className="mb-1">{post.description}</p>}
         {post.tags && <p className="text-sm text-gray-500">{post.tags}</p>}
