@@ -30,9 +30,10 @@ export async function POST(request: Request) {
   const data = await request.json();
   const userId = (session.user as { id?: string }).id as string;
   try {
-    await prisma.user.update({
+    await prisma.user.upsert({
       where: { id: userId },
-      data,
+      update: data,
+      create: { id: userId, ...data },
     });
     return NextResponse.json({ success: true });
   } catch (error) {
