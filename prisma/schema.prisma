@@ -25,6 +25,7 @@ model User {
   Authenticator   Authenticator[]
   posts           Post[]
   comments        Comment[]
+  likes           Like[]
 }
 
 model Post {
@@ -33,10 +34,24 @@ model Post {
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   description String?
   tags        String?
+  views       Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   photos      Photo[]
   comments    Comment[]
+  likes       Like[]
+}
+
+model Like {
+  id        String   @id @default(cuid())
+  postId    String
+  userId    String
+  createdAt DateTime @default(now())
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId])
 }
 
 model Photo {

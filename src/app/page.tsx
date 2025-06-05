@@ -7,14 +7,22 @@ import PostsFeed from '@/components/PostsFeed';
 export default async function Home() {
   const session = await getServerSession(authOptions);
   const take = 10;
-  const posts = await prisma.post.findMany({
+  const currentUserId = (session?.user as { id?: string })?.id;
+  const rawPosts = await prisma.post.findMany({
     take,
     orderBy: { createdAt: 'desc' },
     include: {
       photos: true,
       user: { select: { id: true, nickname: true, name: true, image: true } },
+      likes: currentUserId ? { where: { userId: currentUserId } } : undefined,
+      _count: { select: { likes: true } },
     },
   });
+  const posts = rawPosts.map((p) => ({
+    ...p,
+    likeCount: (p as any)._count.likes,
+    likedByMe: (p as any).likes?.length > 0,
+  }));
   const nextCursor = posts.length === take ? posts[posts.length - 1].id : undefined;
 
   return (

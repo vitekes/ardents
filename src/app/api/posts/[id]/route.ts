@@ -8,17 +8,25 @@ export async function GET(
   { params }: { params: Promise<Record<string, string>> }
 ) {
   const { id } = await params;
+  const session = await getServerSession(authOptions);
+  const currentUserId = (session?.user as { id?: string })?.id;
   const post = await prisma.post.findUnique({
     where: { id },
     include: {
       photos: true,
       user: { select: { id: true, nickname: true, name: true, image: true } },
+      likes: currentUserId ? { where: { userId: currentUserId } } : undefined,
+      _count: { select: { likes: true } },
     },
   });
   if (!post) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 });
   }
-  return NextResponse.json(post);
+  return NextResponse.json({
+    ...post,
+    likeCount: (post as any)._count.likes,
+    likedByMe: (post as any).likes?.length > 0,
+  });
 }
 
 export async function PUT(

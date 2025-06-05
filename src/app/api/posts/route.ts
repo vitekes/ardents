@@ -4,11 +4,13 @@ import { prisma } from '@/lib/db';
 import { NextResponse } from 'next/server';
 
 export async function GET(req: Request) {
+  const session = await getServerSession(authOptions);
+  const currentUserId = (session?.user as { id?: string })?.id;
   const { searchParams } = new URL(req.url);
   const cursor = searchParams.get('cursor');
   const userId = searchParams.get('userId');
   const take = 10;
-  const posts = await prisma.post.findMany({
+  const postsRaw = await prisma.post.findMany({
     take: take + 1,
     ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
     ...(userId ? { where: { userId } } : {}),
@@ -16,8 +18,15 @@ export async function GET(req: Request) {
     include: {
       photos: true,
       user: { select: { id: true, nickname: true, name: true, image: true } },
+      likes: currentUserId ? { where: { userId: currentUserId } } : undefined,
+      _count: { select: { likes: true } },
     },
   });
+  const posts = postsRaw.map((p) => ({
+    ...p,
+    likeCount: (p as any)._count.likes,
+    likedByMe: (p as any).likes?.length > 0,
+  }));
   let nextCursor: string | undefined = undefined;
   if (posts.length > take) {
     const next = posts.pop();
