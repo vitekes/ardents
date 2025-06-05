@@ -26,13 +26,16 @@ export default function PostsFeed({
   initialPosts,
   initialCursor,
   currentUserId,
+  userId,
 }: {
   initialPosts: Post[];
   initialCursor?: string | null;
   currentUserId?: string;
+  userId?: string;
 }) {
   const [posts, setPosts] = useState<Post[]>(initialPosts);
   const [cursor, setCursor] = useState<string | undefined | null>(initialCursor);
+  const [uid] = useState<string | undefined>(userId);
   const loaderRef = useRef<HTMLDivElement | null>(null);
   const loadingRef = useRef(false);
 
@@ -41,7 +44,9 @@ export default function PostsFeed({
     const ob = new IntersectionObserver((entries) => {
       if (entries[0].isIntersecting && cursor && !loadingRef.current) {
         loadingRef.current = true;
-        fetch(`/api/posts?cursor=${cursor}`)
+        const q = new URLSearchParams({ cursor });
+        if (uid) q.append('userId', uid);
+        fetch(`/api/posts?${q.toString()}`)
           .then((r) => (r.ok ? r.json() : null))
           .then((data) => {
             if (data) {
@@ -56,23 +61,29 @@ export default function PostsFeed({
     });
     ob.observe(loaderRef.current);
     return () => ob.disconnect();
-  }, [cursor]);
+  }, [cursor, uid]);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 max-w-lg mx-auto">
       {posts.map((post) => (
         <div key={post.id} className="border p-4 rounded">
           <div className="flex items-center gap-2 mb-2">
             {post.user.image && (
-              <Image
-                src={post.user.image}
-                alt="avatar"
-                width={32}
-                height={32}
-                className="rounded-full"
-              />
+              <Link href={`/u/${post.user.id}`}
+                className="contents"
+              >
+                <Image
+                  src={post.user.image}
+                  alt="avatar"
+                  width={32}
+                  height={32}
+                  className="rounded-full"
+                />
+              </Link>
             )}
-            <span>{post.user.nickname || post.user.name || post.user.id}</span>
+            <Link href={`/u/${post.user.id}`}>
+              {post.user.nickname || post.user.name || post.user.id}
+            </Link>
             {currentUserId === post.user.id && (
               <Link
                 href={`/posts/${post.id}/edit`}
@@ -85,8 +96,8 @@ export default function PostsFeed({
           {post.photos.length > 0 && (
             <ImageCarousel
               photos={post.photos}
-              width={200}
-              height={200}
+              width={480}
+              height={640}
               className="mb-2"
             />
           )}
