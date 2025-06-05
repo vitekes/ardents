@@ -39,7 +39,8 @@ export default function Header() {
   return (
     <header className="flex justify-between items-center p-4 border-b">
       <nav className="flex gap-4">
-        <Link href="/">Home</Link>
+        <Link href="/">Все посты</Link>
+        {session && <Link href="/following">Отслеживаемое</Link>}
         {session && (
           session.user?.nickname ? (
             <Link href="/profile">Мой профиль</Link>
