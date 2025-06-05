@@ -1,5 +1,6 @@
 'use client';
 import { useState, useRef } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
 export default function NewPostPage() {
@@ -52,7 +53,7 @@ export default function NewPostPage() {
             <div className="grid grid-cols-5 gap-2">
               {photoUrls.map((url, i) => (
                 <div key={url} className="relative w-20 h-20">
-                  <img src={url} alt="preview" className="object-cover w-20 h-20" />
+                  <Image src={url} alt="preview" width={80} height={80} className="object-cover w-20 h-20" unoptimized />
                   <button
                     type="button"
                     onClick={(e) => {

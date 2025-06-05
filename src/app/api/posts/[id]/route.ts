@@ -2,6 +2,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { NextResponse, NextRequest } from 'next/server';
+import type { Prisma } from '@prisma/client';
 
 export async function GET(
   _req: NextRequest,
@@ -22,10 +23,19 @@ export async function GET(
   if (!post) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 });
   }
+  type PostWithExtras = Prisma.PostGetPayload<{
+    include: {
+      photos: true;
+      user: { select: { id: true; nickname: true | null; name: true | null; image: true | null } };
+      likes: true;
+      _count: { select: { likes: true } };
+    };
+  }>;
+  const p = post as PostWithExtras;
   return NextResponse.json({
-    ...post,
-    likeCount: (post as any)._count.likes,
-    likedByMe: (post as any).likes?.length > 0,
+    ...p,
+    likeCount: p._count.likes,
+    likedByMe: p.likes.length > 0,
   });
 }
 

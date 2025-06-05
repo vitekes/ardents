@@ -2,6 +2,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { NextResponse } from 'next/server';
+import type { Prisma } from '@prisma/client';
 
 export async function GET(req: Request) {
   const session = await getServerSession(authOptions);
@@ -22,10 +23,19 @@ export async function GET(req: Request) {
       _count: { select: { likes: true } },
     },
   });
-  const posts = postsRaw.map((p) => ({
+
+  type PostWithExtras = Prisma.PostGetPayload<{
+    include: {
+      photos: true;
+      user: { select: { id: true; nickname: true | null; name: true | null; image: true | null } };
+      likes: true;
+      _count: { select: { likes: true } };
+    };
+  }>;
+  const posts = postsRaw.map((p: PostWithExtras) => ({
     ...p,
-    likeCount: (p as any)._count.likes,
-    likedByMe: (p as any).likes?.length > 0,
+    likeCount: p._count.likes,
+    likedByMe: p.likes.length > 0,
   }));
   let nextCursor: string | undefined = undefined;
   if (posts.length > take) {

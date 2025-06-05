@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import PostsFeed from '@/components/PostsFeed';
+import type { Prisma } from '@prisma/client';
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
@@ -18,10 +19,18 @@ export default async function Home() {
       _count: { select: { likes: true } },
     },
   });
-  const posts = rawPosts.map((p) => ({
+  type PostWithExtras = Prisma.PostGetPayload<{
+    include: {
+      photos: true;
+      user: { select: { id: true; nickname: true | null; name: true | null; image: true | null } };
+      likes: true;
+      _count: { select: { likes: true } };
+    };
+  }>;
+  const posts = rawPosts.map((p: PostWithExtras) => ({
     ...p,
-    likeCount: (p as any)._count.likes,
-    likedByMe: (p as any).likes?.length > 0,
+    likeCount: p._count.likes,
+    likedByMe: p.likes.length > 0,
   }));
   const nextCursor = posts.length === take ? posts[posts.length - 1].id : undefined;
 
