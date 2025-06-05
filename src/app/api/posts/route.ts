@@ -27,7 +27,7 @@ export async function GET(req: Request) {
   type PostWithExtras = Prisma.PostGetPayload<{
     include: {
       photos: true;
-      user: { select: { id: true; nickname: true | null; name: true | null; image: true | null } };
+      user: { select: { id: true; nickname: true; name: true; image: true } };
       likes: true;
       _count: { select: { likes: true } };
     };
@@ -64,6 +64,17 @@ export async function POST(request: Request) {
       },
       include: { photos: true, user: { select: { id: true, nickname: true, name: true, image: true } } },
     });
+
+    const followers = await prisma.follow.findMany({
+      where: { followingId: userId },
+      select: { followerId: true },
+    });
+    if (followers.length > 0) {
+      await prisma.notification.createMany({
+        data: followers.map(f => ({ userId: f.followerId, postId: post.id })),
+      });
+    }
+
     return NextResponse.json(post);
   } catch (error) {
     console.error(error);

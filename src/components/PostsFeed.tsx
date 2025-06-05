@@ -31,11 +31,13 @@ export default function PostsFeed({
   initialCursor,
   currentUserId,
   userId,
+  following = false,
 }: {
   initialPosts: Post[];
   initialCursor?: string | null;
   currentUserId?: string;
   userId?: string;
+  following?: boolean;
 }) {
   const [posts, setPosts] = useState<Post[]>(initialPosts);
   const [cursor, setCursor] = useState<string | undefined | null>(initialCursor);
@@ -50,7 +52,8 @@ export default function PostsFeed({
         loadingRef.current = true;
         const q = new URLSearchParams({ cursor });
         if (uid) q.append('userId', uid);
-        fetch(`/api/posts?${q.toString()}`)
+        const url = following ? `/api/posts/following?${q.toString()}` : `/api/posts?${q.toString()}`;
+        fetch(url)
           .then((r) => (r.ok ? r.json() : null))
           .then((data) => {
             if (data) {
@@ -65,7 +68,7 @@ export default function PostsFeed({
     });
     ob.observe(loaderRef.current);
     return () => ob.disconnect();
-  }, [cursor, uid]);
+  }, [cursor, uid, following]);
 
   return (
     <div className="space-y-4 max-w-lg mx-auto">

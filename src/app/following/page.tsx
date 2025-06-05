@@ -1,24 +1,34 @@
-import Link from 'next/link';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import PostsFeed from '@/components/PostsFeed';
 import type { Prisma } from '@prisma/client';
 
-export default async function Home() {
+export default async function FollowingPage() {
   const session = await getServerSession(authOptions);
+  if (!session) return <p className="p-8">Please login</p>;
+
+  const currentUserId = (session.user as { id: string }).id;
+  const following = await prisma.follow.findMany({
+    where: { followerId: currentUserId },
+    select: { followingId: true },
+  });
+  const ids = following.map(f => f.followingId);
+  if (ids.length === 0) return <p className="p-8">Вы никого не отслеживаете</p>;
+
   const take = 10;
-  const currentUserId = (session?.user as { id?: string })?.id;
   const rawPosts = await prisma.post.findMany({
     take,
+    where: { userId: { in: ids } },
     orderBy: { createdAt: 'desc' },
     include: {
       photos: true,
       user: { select: { id: true, nickname: true, name: true, image: true } },
-      likes: currentUserId ? { where: { userId: currentUserId } } : undefined,
+      likes: { where: { userId: currentUserId } },
       _count: { select: { likes: true } },
     },
   });
+
   type PostWithExtras = Prisma.PostGetPayload<{
     include: {
       photos: true;
@@ -35,16 +45,8 @@ export default async function Home() {
   const nextCursor = posts.length === take ? posts[posts.length - 1].id : undefined;
 
   return (
-    <section className="p-8 space-y-4">
-      {session && (
-        <Link
-          href="/posts/new"
-          className="px-4 py-2 border rounded bg-blue-500 text-white hover:bg-blue-600 inline-block"
-        >
-          Новый пост
-        </Link>
-      )}
-      <PostsFeed initialPosts={posts} initialCursor={nextCursor} currentUserId={(session?.user as { id?: string })?.id} />
+    <section className="p-8">
+      <PostsFeed initialPosts={posts} initialCursor={nextCursor} currentUserId={currentUserId} following />
     </section>
   );
 }

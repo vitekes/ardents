@@ -26,7 +26,7 @@ export async function GET(
   type PostWithExtras = Prisma.PostGetPayload<{
     include: {
       photos: true;
-      user: { select: { id: true; nickname: true | null; name: true | null; image: true | null } };
+      user: { select: { id: true; nickname: true; name: true; image: true } };
       likes: true;
       _count: { select: { likes: true } };
     };

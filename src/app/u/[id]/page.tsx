@@ -3,6 +3,7 @@ import Image from 'next/image'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import PostsFeed from '@/components/PostsFeed'
+import FollowButton from '@/components/FollowButton'
 
 export default async function PublicProfile({
   params,
@@ -14,6 +15,12 @@ export default async function PublicProfile({
     getServerSession(authOptions),
     prisma.user.findUnique({ where: { id } }),
   ]);
+
+  const isFollowing = session
+    ? (await prisma.follow.findUnique({
+        where: { followerId_followingId: { followerId: (session.user as { id: string }).id, followingId: id } },
+      })) != null
+    : false;
 
   const take = 10;
   const posts = await prisma.post.findMany({
@@ -45,6 +52,9 @@ export default async function PublicProfile({
           <p className="mt-2">
             Website: <a href={user.website}>{user.website}</a>
           </p>
+        )}
+        {session && session.user?.id !== id && (
+          <FollowButton userId={id} initialFollowing={isFollowing} />
         )}
       </div>
       <PostsFeed

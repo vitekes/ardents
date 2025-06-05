@@ -26,6 +26,9 @@ model User {
   posts           Post[]
   comments        Comment[]
   likes           Like[]
+  following       Follow[]      @relation("UserFollows")
+  followers       Follow[]      @relation("UserFollowedBy")
+  notifications   Notification[]
 }
 
 model Post {
@@ -40,6 +43,7 @@ model Post {
   photos      Photo[]
   comments    Comment[]
   likes       Like[]
+  notifications Notification[]
 }
 
 model Like {
@@ -123,4 +127,26 @@ model Authenticator {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([userId, credentialID])
+}
+
+model Follow {
+  followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
+
+  follower  User @relation("UserFollows", fields: [followerId], references: [id], onDelete: Cascade)
+  following User @relation("UserFollowedBy", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@id([followerId, followingId])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  postId    String
+  createdAt DateTime @default(now())
+  read      Boolean  @default(false)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
 }
