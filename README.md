@@ -36,6 +36,18 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+
+## CMS (Directus)
+A minimal [Directus](https://directus.io) setup is included in the `directus` directory.
+
+```bash
+cd directus
+npm install
+cp .env.example .env
+npm start
+```
+
+This runs a local Directus instance using SQLite for storage.
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
