@@ -27,7 +27,7 @@
     "swr": "^2.2.0",
     "viem": "^2.30.6",
     "wagmi": "^2.15.4",
-    "@directus/sdk": "^9"
+    "@directus/sdk": "^10"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
