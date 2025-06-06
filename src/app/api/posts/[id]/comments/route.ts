@@ -32,6 +32,12 @@ export async function POST(
     prisma.user.findUnique({ where: { id: userId } }),
     prisma.post.findUnique({ where: { id }, select: { banned: true, banExpiresAt: true } }),
   ]);
+  if (!post) {
+    return NextResponse.json({ error: 'Post not found' }, { status: 404 });
+  }
+  if (!user) {
+    return NextResponse.json({ error: 'User not found' }, { status: 404 });
+  }
   const now = new Date();
   if (user?.banned && (!user.banExpiresAt || user.banExpiresAt > now)) {
     return NextResponse.json({ error: 'Banned' }, { status: 403 });
