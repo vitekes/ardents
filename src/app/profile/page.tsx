@@ -3,6 +3,7 @@ import { authOptions } from '@/lib/auth';
 import Image from 'next/image';
 import Link from 'next/link';
 import PostsFeed from '@/components/PostsFeed';
+import type { Prisma } from '@prisma/client';
 
 import { prisma } from '@/lib/db';
 
@@ -26,15 +27,30 @@ export default async function MyProfile() {
   if (!user) return <p className="p-8">Profile not found</p>;
 
   const take = 10;
-  const posts = await prisma.post.findMany({
+  const rawPosts = await prisma.post.findMany({
     take,
     where: { userId: user.id },
     orderBy: { createdAt: 'desc' },
     include: {
       photos: true,
       user: { select: { id: true, nickname: true, name: true, image: true } },
+      likes: { where: { userId: user.id } },
+      _count: { select: { likes: true } },
     },
   });
+  type PostWithExtras = Prisma.PostGetPayload<{
+    include: {
+      photos: true;
+      user: { select: { id: true; nickname: true; name: true; image: true } };
+      likes: true;
+      _count: { select: { likes: true } };
+    };
+  }>;
+  const posts = rawPosts.map((p: PostWithExtras) => ({
+    ...p,
+    likeCount: p._count.likes,
+    likedByMe: p.likes.length > 0,
+  }));
   const nextCursor = posts.length === take ? posts[posts.length - 1].id : undefined;
 
   return (
