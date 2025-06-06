@@ -16,11 +16,11 @@ npm install
 ```bash
 cp .env.example .env
 ```
-
-3. Start the CMS:
+3. Start the CMS together with the Next.js app from the project root:
 
 ```bash
-npm start
+npm run dev
 ```
 
-The CMS will create a `data.db` SQLite database inside this folder on first run. The default admin credentials are taken from the `.env` file.
+You can also run Directus only using `npm start` inside this folder. The CMS will create a `data.db` SQLite database on first run, using the credentials from `.env`.
+

@@ -2,7 +2,7 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
-First, run the development server:
+First, run the development server (this will start both Next.js and Directus):
 
 ```bash
 npm run dev
@@ -40,14 +40,15 @@ This project uses [`next/font`](https://nextjs.org/docs/app/building-your-applic
 ## CMS (Directus)
 A minimal [Directus](https://directus.io) setup is included in the `directus` directory.
 
+The CMS starts automatically when running `npm run dev` from the project root.
+You can still launch it separately with:
+
 ```bash
-cd directus
-npm install
-cp .env.example .env
-npm start
+npm run cms
 ```
 
-This runs a local Directus instance using SQLite for storage.
+This uses a local SQLite database for storage.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
