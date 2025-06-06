@@ -54,6 +54,12 @@ export const authOptions: NextAuthOptions = {
 
           if (!user) {
             user = await prisma.user.create({ data: { id: address } });
+            try {
+              const { createDirectusUser } = await import('./directus');
+              await createDirectusUser(address);
+            } catch (err) {
+              console.error('Directus user sync failed', err);
+            }
           }
 
           /* 5. Возвращаем объект user с обязательным полем id */

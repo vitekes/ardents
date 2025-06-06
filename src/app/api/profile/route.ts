@@ -35,6 +35,12 @@ export async function POST(request: Request) {
       update: data,
       create: { id: userId, ...data },
     });
+    try {
+      const { updateDirectusUser } = await import('@/lib/directus');
+      await updateDirectusUser(userId, data);
+    } catch (err) {
+      console.error('Directus profile sync failed', err);
+    }
     return NextResponse.json({ success: true });
   } catch (error) {
     if (
