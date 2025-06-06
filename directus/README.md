@@ -16,6 +16,7 @@ npm install
 ```bash
 cp .env.example .env
 ```
+
 3. Start the CMS together with the Next.js app from the project root:
 
 ```bash

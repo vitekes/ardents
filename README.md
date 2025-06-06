@@ -14,10 +14,11 @@ pnpm dev
 bun dev
 ```
 
-Create a `.env` file based on `.env.example` before starting the server:
+Create a `.env` file based on `.env.example` before starting the server. Directus also requires its own environment file:
 
 ```bash
 cp .env.example .env
+cp directus/.env.example directus/.env
 ```
 
 Set `NEXTAUTH_SECRET` to any random string. If you access the app through a

@@ -12,7 +12,6 @@
     "cms": "npm --prefix directus start",
     "dev-site": "prisma migrate deploy --schema=./prisma/schema.prisma && next dev --turbopack",
     "start-site": "prisma migrate deploy --schema=./prisma/schema.prisma && next start"
-
   },
   "dependencies": {
     "@next-auth/prisma-adapter": "^1.0.7",
