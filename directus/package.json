@@ -1,0 +1,11 @@
+{
+  "name": "ardents-directus",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "directus start"
+  },
+  "dependencies": {
+    "directus": "latest"
+  }
+}
