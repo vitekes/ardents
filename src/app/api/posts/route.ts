@@ -18,7 +18,7 @@ export async function GET(req: Request) {
     orderBy: { createdAt: 'desc' },
     include: {
       photos: true,
-      user: { select: { id: true, nickname: true, name: true, image: true } },
+      user: { select: { id: true, nickname: true, name: true, image: true, banned: true, banExpiresAt: true } },
       likes: currentUserId ? { where: { userId: currentUserId } } : undefined,
       _count: { select: { likes: true } },
     },
@@ -27,16 +27,24 @@ export async function GET(req: Request) {
   type PostWithExtras = Prisma.PostGetPayload<{
     include: {
       photos: true;
-      user: { select: { id: true; nickname: true; name: true; image: true } };
+      user: { select: { id: true; nickname: true; name: true; image: true; banned: true; banExpiresAt: true } };
       likes: true;
       _count: { select: { likes: true } };
     };
   }>;
-  const posts = postsRaw.map((p: PostWithExtras) => ({
-    ...p,
-    likeCount: p._count.likes,
-    likedByMe: p.likes.length > 0,
-  }));
+
+  const now = new Date();
+  const posts = postsRaw
+    .filter((p: any) => {
+      const userBanned = p.user.banned && (!p.user.banExpiresAt || new Date(p.user.banExpiresAt) > now);
+      const postBanned = p.banned && (!p.banExpiresAt || new Date(p.banExpiresAt) > now);
+      return !userBanned && !postBanned;
+    })
+    .map((p: PostWithExtras) => ({
+      ...p,
+      likeCount: p._count.likes,
+      likedByMe: p.likes.length > 0,
+    }));
   let nextCursor: string | undefined = undefined;
   if (posts.length > take) {
     const next = posts.pop();
@@ -52,6 +60,11 @@ export async function POST(request: Request) {
   }
   const data = await request.json();
   const userId = (session.user as { id: string }).id;
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  const now = new Date();
+  if (user?.banned && (!user.banExpiresAt || user.banExpiresAt > now)) {
+    return NextResponse.json({ error: 'Banned' }, { status: 403 });
+  }
   try {
     const post = await prisma.post.create({
       data: {

@@ -28,6 +28,17 @@ export async function POST(
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
   const userId = (session.user as { id: string }).id;
+  const [user, post] = await Promise.all([
+    prisma.user.findUnique({ where: { id: userId } }),
+    prisma.post.findUnique({ where: { id }, select: { banned: true, banExpiresAt: true } }),
+  ]);
+  const now = new Date();
+  if (user?.banned && (!user.banExpiresAt || user.banExpiresAt > now)) {
+    return NextResponse.json({ error: 'Banned' }, { status: 403 });
+  }
+  if (post?.banned && (!post.banExpiresAt || post.banExpiresAt > now)) {
+    return NextResponse.json({ error: 'Post banned' }, { status: 403 });
+  }
   const data = await req.json();
   try {
     const comment = await prisma.comment.create({

@@ -15,7 +15,7 @@ export async function GET(
     where: { id },
     include: {
       photos: true,
-      user: { select: { id: true, nickname: true, name: true, image: true } },
+      user: { select: { id: true, nickname: true, name: true, image: true, banned: true, banExpiresAt: true } },
       likes: currentUserId ? { where: { userId: currentUserId } } : undefined,
       _count: { select: { likes: true } },
     },
@@ -26,12 +26,18 @@ export async function GET(
   type PostWithExtras = Prisma.PostGetPayload<{
     include: {
       photos: true;
-      user: { select: { id: true; nickname: true; name: true; image: true } };
+      user: { select: { id: true; nickname: true; name: true; image: true; banned: true; banExpiresAt: true } };
       likes: true;
       _count: { select: { likes: true } };
     };
   }>;
   const p = post as PostWithExtras;
+  const now = new Date();
+  const userBanned = p.user.banned && (!p.user.banExpiresAt || new Date(p.user.banExpiresAt) > now);
+  const postBanned = p.banned && (!p.banExpiresAt || new Date(p.banExpiresAt) > now);
+  if (userBanned || postBanned) {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  }
   return NextResponse.json({
     ...p,
     likeCount: p._count.likes,
