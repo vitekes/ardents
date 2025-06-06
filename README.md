@@ -26,7 +26,9 @@ current request's host will be used for authentication.
 
 When you start the development server the first time, the Prisma schema will be
 applied automatically via `prisma migrate deploy`. This creates the `dev.db`
-SQLite database if it does not already exist.
+SQLite database if it does not already exist. If you pull new changes that add
+more migrations, run `prisma migrate deploy` again before launching the app so
+the database stays up to date.
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
