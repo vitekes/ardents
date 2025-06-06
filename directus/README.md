@@ -24,3 +24,4 @@ npm run dev
 ```
 
 You can also run Directus only using `npm start` inside this folder. The CMS will create a `data.db` SQLite database on first run, using the credentials from `.env`.
+

@@ -40,6 +40,7 @@ This project uses [`next/font`](https://nextjs.org/docs/app/building-your-applic
 
 ## CMS (Directus)
 A minimal [Directus](https://directus.io) setup is included in the `directus` directory.
+
 The CMS starts automatically when running `npm run dev` from the project root.
 You can still launch it separately with:
 
@@ -48,6 +49,7 @@ npm run cms
 ```
 
 This uses a local SQLite database for storage.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
