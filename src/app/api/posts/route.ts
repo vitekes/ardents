@@ -27,7 +27,7 @@ export async function GET(req: Request) {
   type PostWithExtras = Prisma.PostGetPayload<{
     include: {
       photos: true;
-      user: { select: { id: true; nickname: true; name: true; image: true; banned: true; banExpiresAt: true } };
+      user: { select: { id: true, nickname: true, name: true, image: true, banned: true, banExpiresAt: true } };
       likes: true;
       _count: { select: { likes: true } };
     };
@@ -35,7 +35,7 @@ export async function GET(req: Request) {
 
   const now = new Date();
   const posts = postsRaw
-    .filter((p: any) => {
+    .filter((p: PostWithExtras) => {
       const userBanned = p.user.banned && (!p.user.banExpiresAt || new Date(p.user.banExpiresAt) > now);
       const postBanned = p.banned && (!p.banExpiresAt || new Date(p.banExpiresAt) > now);
       return !userBanned && !postBanned;
