@@ -20,6 +20,8 @@ model User {
   telegram        String?
   website         String?
   donationAddress String?
+  banned          Boolean   @default(false)
+  banExpiresAt    DateTime?
   accounts        Account[]
   sessions        Session[]
   Authenticator   Authenticator[]
@@ -38,6 +40,8 @@ model Post {
   description String?
   tags        String?
   views       Int      @default(0)
+  banned      Boolean  @default(false)
+  banExpiresAt DateTime?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   photos      Photo[]
