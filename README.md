@@ -2,7 +2,7 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
-First, run the development server:
+First, run the development server (this will start both Next.js and Directus):
 
 ```bash
 npm run dev
@@ -36,6 +36,17 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+
+## CMS (Directus)
+A minimal [Directus](https://directus.io) setup is included in the `directus` directory.
+The CMS starts automatically when running `npm run dev` from the project root.
+You can still launch it separately with:
+
+```bash
+npm run cms
+```
+
+This uses a local SQLite database for storage.
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
